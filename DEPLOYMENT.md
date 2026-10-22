@@ -43,9 +43,32 @@ You already have an active cloud PostgreSQL database set up on **Neon**:
 
 ---
 
-## Step 3: Deploy the Backend API (Render or Railway)
+## Step 3: Deploy the Backend API
 
-### Using **Render** (Recommended & Free):
+### Option A: Using Fly.io (Recommended with Dockerfile)
+Both `fly.toml` and `Dockerfile` are already configured in both the root and `server/` directory.
+
+1. Navigate to the `server` folder (or project root):
+   ```bash
+   cd server
+   ```
+2. Set your production secrets (Supabase Database URL and JWT Secret):
+   ```bash
+   fly secrets set DATABASE_URL="postgresql://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true" JWT_SECRET="payrolleey_prod_super_secret_jwt_2026_enterprise" NODE_ENV="production"
+   ```
+3. Deploy directly using the existing configuration:
+   ```bash
+   fly deploy
+   ```
+   *(Or `flyctl deploy`)*
+4. Verify your backend is running:
+   ```bash
+   fly status
+   fly open /api/health
+   ```
+   Your backend will be live at `https://payrollee.fly.dev`!
+
+### Option B: Using Render (Alternative):
 1. Go to [render.com](https://render.com) and sign in with GitHub.
 2. Click **New +** → **Web Service**.
 3. Select your GitHub repository `payrolleey`.
@@ -56,7 +79,7 @@ You already have an active cloud PostgreSQL database set up on **Neon**:
    - **Build Command**: `npm install && npm run build`
    - **Start Command**: `npm start`
 5. Under **Environment Variables**, add:
-   - `DATABASE_URL` = `postgresql://neondb_owner:npg_6wmotAPp7Tzs@ep-bitter-dawn-b8u7go3m-pooler.c-14.us-east-1.aws.neon.tech/payrolleey_db?sslmode=require`
+   - `DATABASE_URL` = `your_database_url`
    - `JWT_SECRET` = `payrolleey_prod_super_secret_jwt_2026_enterprise`
    - `NODE_ENV` = `production`
 6. Click **Deploy Web Service**.
