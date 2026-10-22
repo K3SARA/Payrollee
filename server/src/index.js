@@ -60,7 +60,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`PayRolleey Backend running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`PayRolleey Backend running on http://0.0.0.0:${PORT}`);
   console.log(`Sri Lanka 2026 Statutory Payroll Engine initialized.`);
 });
