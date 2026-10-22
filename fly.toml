@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for payrollee on 2026-10-22T08:17:56Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'payrollee'
 primary_region = 'ams'
 
@@ -5,8 +10,8 @@ primary_region = 'ams'
   dockerfile = 'Dockerfile'
 
 [env]
-  PORT = '5000'
   NODE_ENV = 'production'
+  PORT = '5000'
 
 [http_service]
   internal_port = 5000
@@ -20,3 +25,4 @@ primary_region = 'ams'
   memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 512
