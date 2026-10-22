@@ -1,0 +1,16 @@
+{
+  "name": "payrolleey",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PayRolleey - Sri Lanka 2026 Statutory Payroll Management System",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "dev:server": "npm --prefix server start",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm --prefix client run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

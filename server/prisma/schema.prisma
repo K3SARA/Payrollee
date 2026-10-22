@@ -1,0 +1,188 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  HR_ADMIN
+  EMPLOYEE
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  OVERTIME
+  UNPAID_LEAVE
+  SICK_LEAVE
+  CASUAL_LEAVE
+  HALF_DAY
+}
+
+enum LeaveType {
+  ANNUAL
+  CASUAL
+  SICK
+  UNPAID
+  MATERNITY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PeriodType {
+  MONTHLY
+  BI_WEEKLY
+  WEEKLY
+}
+
+enum PayrollStatus {
+  DRAFT
+  PROCESSED
+  PAID
+}
+
+enum ItemStatus {
+  DRAFT
+  ISSUED
+  PAID
+}
+
+model User {
+  id                    String            @id @default(uuid())
+  email                 String            @unique
+  passwordHash          String
+  role                  Role              @default(EMPLOYEE)
+  isActive              Boolean           @default(true)
+  employeeProfile       EmployeeProfile?
+  payrollRunsProcessed  PayrollRun[]      @relation("ProcessedRuns")
+  leavesApproved        LeaveRequest[]    @relation("ApprovedLeaves")
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+}
+
+model EmployeeProfile {
+  id                      String             @id @default(uuid())
+  userId                  String             @unique
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeNumber          String             @unique
+  firstName               String
+  lastName                String
+  designation             String
+  department              String
+  joinDate                DateTime
+  phone                   String?
+  address                 String?
+  nicNumber               String             // National Identity Card
+  taxIdentificationNumber String             // Sri Lanka TIN
+  bankName                String
+  bankBranch              String
+  accountNumber           String
+  baseSalary              Float              // Monthly Base in LKR
+  currency                String             @default("LKR")
+  avatarUrl               String?
+  employmentStatus        EmploymentStatus   @default(ACTIVE)
+  attendanceRecords       AttendanceRecord[]
+  leaveRequests           LeaveRequest[]
+  payrollItems            PayrollItem[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+}
+
+model AttendanceRecord {
+  id            String           @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date          DateTime
+  checkIn       String?
+  checkOut      String?
+  regularHours  Float            @default(8.0)
+  overtimeHours Float            @default(0.0)
+  status        AttendanceStatus @default(PRESENT)
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model LeaveRequest {
+  id           String          @id @default(uuid())
+  employeeId   String
+  employee     EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType    LeaveType
+  startDate    DateTime
+  endDate      DateTime
+  totalDays    Float
+  reason       String
+  status       LeaveStatus     @default(PENDING)
+  approvedById String?
+  approvedBy   User?           @relation("ApprovedLeaves", fields: [approvedById], references: [id])
+  reviewNotes  String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model PayrollRun {
+  id                 String        @id @default(uuid())
+  runNumber          String        @unique // e.g., PR-2026-03
+  periodType         PeriodType    @default(MONTHLY)
+  periodMonth        Int
+  periodYear         Int
+  startDate          DateTime
+  endDate            DateTime
+  executionDate      DateTime      @default(now())
+  status             PayrollStatus @default(DRAFT)
+  totalGross         Float         @default(0)
+  totalNet           Float         @default(0)
+  totalEmployeeEpf   Float         @default(0) // 8% EPF
+  totalEmployerEpf   Float         @default(0) // 12% EPF
+  totalEmployerEtf   Float         @default(0) // 3% ETF
+  totalApit          Float         @default(0) // Sri Lanka Progressive APIT
+  totalCostToCompany Float         @default(0) // Gross + 15% Employer EPF & ETF
+  processedById      String?
+  processedBy        User?         @relation("ProcessedRuns", fields: [processedById], references: [id])
+  notes              String?
+  items              PayrollItem[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
+
+model PayrollItem {
+  id                   String          @id @default(uuid())
+  payrollRunId         String
+  payrollRun           PayrollRun      @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employeeId           String
+  employee             EmployeeProfile @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  baseSalary           Float
+  loggedHours          Float           @default(160)
+  overtimeHours        Float           @default(0)
+  overtimePay          Float           @default(0)
+  allowances           Float           @default(0)
+  bonuses              Float           @default(0)
+  unpaidLeaveDays      Float           @default(0)
+  unpaidLeaveDeduction Float           @default(0)
+  grossPay             Float
+  employeeEpf          Float           // 8% EPF
+  taxableIncome        Float           // grossPay - employeeEpf
+  apitTax              Float           // Sri Lanka 2026 APIT
+  otherDeductions      Float           @default(0)
+  netPay               Float           // grossPay - (employeeEpf + apitTax + otherDeductions)
+  employerEpf          Float           // 12% Employer EPF
+  employerEtf          Float           // 3% Employer ETF
+  costToCompany        Float           // grossPay + employerEpf + employerEtf
+  payslipPdfUrl        String?
+  status               ItemStatus      @default(DRAFT)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}

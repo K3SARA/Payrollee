@@ -1,0 +1,151 @@
+Role & Objective:
+Act as an expert Full-Stack Developer and UI/UX Designer. Build a complete, modern, and high-resolution web-based Payroll Management System. The application must be fully responsive, visually crisp on high-DPI (retina) displays, and prioritize an intuitive, uncluttered user experience.
+
+Core Features & Modules Required:
+
+Admin Dashboard:
+
+High-level metrics: Total payroll cost, number of active employees, pending leave requests, and upcoming payroll run dates.
+
+Visual charts (bar/pie) breaking down expenses by department.
+
+Employee Management:
+
+A directory table with high-quality avatars, search, and filtering.
+
+Detailed employee profiles including personal details, role, department, base salary, bank details, and tax identification numbers.
+
+CRUD (Create, Read, Update, Delete) capabilities for employee records.
+
+Attendance & Time Tracking:
+
+Interfaces for logging regular hours, overtime, and unpaid leave.
+
+A leave management section to approve or deny time-off requests.
+
+Payroll Processing Engine:
+
+A dedicated interface to run payroll for a specific pay period (weekly, bi-weekly, or monthly).
+
+Automated calculation of Gross Pay based on base salary and logged hours/overtime.
+
+Dynamic input fields for custom additions (bonuses, reimbursements) and deductions (taxes, health insurance, retirement contributions).
+
+Final Net Pay calculation clearly displayed before execution.
+
+Payslips & Reporting:
+
+Auto-generated, professional payslips for each employee after a payroll run.
+
+A "Download as PDF" or high-resolution print view for payslips.
+
+A historical payroll ledger to view past pay runs.
+
+UI/UX & Design Specifications:
+
+Visuals: Use a modern, clean design system with plenty of white space. Ensure all icons, typography, and borders are high-resolution and scale perfectly.
+
+Color Palette: Professional and trustworthy (e.g., deep blues, crisp whites, and subtle grays for backgrounds, with clear semantic colors like green for success/payments and red for deductions/alerts).
+
+Usability: Implement a persistent sidebar navigation menu and a top app bar for quick actions. Use modal windows or slide-out panels for adding/editing data to keep the user in the context of the main tables.
+
+Data Grids: All tables should support pagination, sorting, and inline quick-actions.
+
+Technical Requirements:
+
+Generate clean, modular, and well-commented code.
+
+Ensure state management handles the payroll calculations accurately without rounding errors.
+
+Use mock data to populate the initial UI so I can test the layouts and interactions immediately.
+
+Localization & Statutory Compliance (Sri Lanka 2026):
+The payroll engine must strictly implement Sri Lankan statutory deductions and tax rules:
+
+EPF & ETF Calculations:
+
+Employee EPF: Deduct exactly 8% from the employee's gross earnings.
+
+Employer EPF: Calculate 12% of the employee's gross earnings as an employer cost (do not deduct from the employee).
+
+Employer ETF: Calculate 3% of the employee's gross earnings as a separate employer cost (do not deduct from the employee).
+
+APIT (PAYE) Tax Engine:
+
+Calculate the employee's taxable income by taking the gross salary and deducting the employee's 8% EPF contribution.
+
+Apply the statutory monthly tax-free personal relief of LKR 150,000.
+
+For any remaining taxable income above LKR 150,000, apply these progressive monthly tax bands automatically:
+
+First LKR 83,333.33 at 6%
+
+Next LKR 41,666.67 at 18%
+
+Next LKR 41,666.67 at 24%
+
+Next LKR 41,666.67 at 30%
+
+Any remaining balance at 36%
+
+UI/Reporting Additions:
+
+The generated payslip must clearly separate "Employee Deductions" (8% EPF + APIT) from "Employer Contributions" (12% EPF + 3% ETF).
+
+Include a payroll summary report that shows the Total Cost to Company (Gross Salary + 15% Employer Contributions) for a given pay period.
+
+Authentication & Role-Based Access Control (RBAC):
+Implement a secure authentication system (e.g., JWT-based) with strict route protection and data isolation. The system must support two distinct user roles with separate UI experiences and permissions:
+
+HR_ADMIN Role:
+
+Access: Unrestricted access to the entire system.
+
+Capabilities: Can view the global dashboard, manage all employee records, approve/deny leave requests, execute payroll runs, and view company-wide financial reports.
+
+Navigation: Sees the full sidebar with all administrative modules.
+
+EMPLOYEE Role:
+
+Access: Strictly limited to their own personal data (Data Isolation).
+
+Capabilities:
+
+View a simplified personal dashboard.
+
+Update basic personal profile details (subject to admin approval for sensitive fields like bank accounts).
+
+Submit daily attendance/timesheets and request time off.
+
+View and download their own historical payslips.
+
+Restrictions: Cannot access the global employee directory, payroll execution engine, or company financial reports. Attempts to access admin routes must automatically redirect to an "Unauthorized" page.
+
+UI Dynamic Rendering:
+The frontend application must dynamically render navigation links, dashboard widgets, and action buttons based on the active user's decoded token role. Ensure API endpoints also validate the user's role on the backend before returning any sensitive 
+salary data.
+
+Technology Stack & Architecture:
+The application must be explicitly built using the following stack. Ensure all generated code, project structure, and configuration files adhere to best practices for these specific tools:
+
+Frontend (Client):
+
+Framework: React (strictly use functional components and modern React Hooks).
+
+State Management: Use Context API or a lightweight state manager appropriate for handling RBAC and payroll dashboard states.
+
+Styling: Implement high-resolution, responsive designs (Tailwind CSS is preferred for clean, maintainable styling).
+
+Backend (API):
+
+Runtime & Framework: Node.js with Express.js.
+
+Architecture: Implement a RESTful API with a clear separation of concerns (isolate routes, controllers, and business logic services).
+
+Database & ORM:
+
+Database: PostgreSQL.
+
+ORM: Prisma ORM.
+
+Schema Requirement: You must generate the complete schema.prisma file. It must include properly related models for User (handling HR_ADMIN and EMPLOYEE roles), EmployeeProfile, AttendanceRecord, LeaveRequest, and PayrollRun (handling the Sri Lankan EPF/ETF and APIT calculations).
